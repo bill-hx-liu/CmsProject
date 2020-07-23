@@ -3,11 +3,11 @@ package controller
 import (
 	"CmsProject/model"
 	"CmsProject/service"
+	"CmsProject/utils"
 	"encoding/json"
 	"github.com/kataras/iris"
 	"github.com/kataras/iris/mvc"
 	"github.com/kataras/iris/sessions"
-	"irisDemo/qianfengCmsProject/utils"
 )
 
 /*
@@ -40,7 +40,7 @@ type AdminLogin struct {
 请求url:admin/signout
 */
 func (ac *AdminController)GetSignout() mvc.Result  {
-	//删除session，下次需要重新登录
+	//删除session，下次需要重新登录。而不是数据库中的数据
 	ac.Session.Delete(ADMIN)
 	return mvc.Response{
 		Object: map[string]interface{}{
@@ -86,7 +86,7 @@ func (ac *AdminController)GetInfo()mvc.Result  {
 			Object:map[string]interface{}{
 				"status":utils.RECODE_UNLOGIN,
 				"type" :utils.EEROR_UNLOGIN,
-				"message":utils.Recode2Text(utils.EEROR_UNLOGIN),
+				"message":utils.Recode2Text(utils.EEROR_UNLOGIN),//将代码映射到文本
 			},
 		}
 	}
