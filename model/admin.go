@@ -18,10 +18,10 @@ type Admin struct {
 	CityId int64	`xorm:"index" json:"city_id"`//索引
 	City	*City	`xorm:"- <- ->"`//对应所在城市的结构体(基础表结构体)
 }
-//城市结构体
-type City struct {
-
-}
+////城市结构体
+//type City struct {
+//
+//}
 /**
  * 从Admin数据库实体转换为前端请求的resp的json格式
  */

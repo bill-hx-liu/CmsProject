@@ -105,10 +105,26 @@ func mvcHandle(app *iris.Application) {
 
 	//构造数据库引擎
 	engine := datasource.NewMysqlEngine()
+	//fmt.Println(engine)
 	//管理员模块功能
 	adminService := service.NewAdminService(engine)//j将上面的引擎放到模块中
 	admin := mvc.New(app.Party("/admin"))//路由组
 	admin.Register(adminService,sessManage.Start,)//注册处理业的务逻辑
 	admin.Handle(new(controller.AdminController))//将注册的业务逻辑赋值给一个新得AdminController,并传入控制handle
+
+	//统计功能模块
+	statisService := service.NewStatisService(engine)
+	statis := mvc.New(app.Party("/statis/{model}/{date}/"))//正则表达式
+	statis.Register(statisService,sessManage.Start,)
+	statis.Handle(new(controller.StatisController))
+
+	//用户功能模块
+	userService := service.NewUserService(engine)
+	user := mvc.New(app.Party("/v1/users"))
+	user.Register(
+		userService,
+		sessManage.Start,
+	)
+	user.Handle(new(controller.UserController))
 }
 

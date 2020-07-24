@@ -119,6 +119,7 @@ func (ac *AdminController)PostLogin() mvc.Result {
 	iris.New().Logger().Info("admin login")
 	var adminLogin AdminLogin
 	ac.Ctx.ReadJSON(&adminLogin)
+	//fmt.Println(adminLogin)
 	//数据参数检验
 	if adminLogin.UserName == "" || adminLogin.Password == ""{
 		return mvc.Response{
@@ -130,7 +131,11 @@ func (ac *AdminController)PostLogin() mvc.Result {
 		}
 	}
 	//根据用户名、密码到数据库中查询对应的管理信息
+	//fmt.Println(adminLogin.UserName)//lhx
+	//fmt.Println(adminLogin.Password)//123
 	admin,exist := ac.Service.GetByAdminNameAndPassword(adminLogin.UserName,adminLogin.Password)
+	//fmt.Println(admin)
+	//fmt.Println(exist)
 	//管理员不存在
 	if !exist{
 		return mvc.Response{

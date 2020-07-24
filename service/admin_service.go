@@ -48,7 +48,7 @@ func (ac *adminService) GetAdminCount()(int64,error)  {
 */
 func (ac *adminService)GetByAdminNameAndPassword(username,paaaword string)(model.Admin,bool)  {
 	var admin model.Admin
-	ac.engine.Where("admin = ? and pwd = ?",username,paaaword).Get(&admin)
+	ac.engine.Where("admin_name = ? and pwd = ?",username,paaaword).Get(&admin)//字段不对了，卡在这里了
 	return admin,admin.AdminId != 0//是否有此对象
 }
 
