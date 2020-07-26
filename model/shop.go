@@ -4,11 +4,11 @@ package model
  * 商店实体结构体定义
  */
 type Shop struct {
-	Id                          int        `xorm:"pk autoincr" json:"item_id"`      //店铺Id
+	ShopId                          int        `xorm:"pk autoincr" json:"item_id"`      //店铺Id
 	Name                        string     `xorm:"varchar(32)" json:"name"`         //店铺名称
 	Address                     string     `xorm:"varchar(128)" json:"address"`     //店铺地址
-	Latitude                    float32    `json:"latitude"`                        //经度
-	Longitude                   float32    `json:"longitude"`                       //纬度
+	Latitude                    float64    `json:"latitude"`                        //经度
+	Longitude                   float64    `json:"longitude"`                       //纬度
 	Description                 string     `xorm:"varchar(255)" json:"description"` //店铺简介
 	Phone                       string     `json:"phone"`                           //店铺电话
 	PromotionInfo               string     `json:"promotion_info"`                  //店铺标语

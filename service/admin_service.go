@@ -16,6 +16,12 @@ type AdminService interface {
 
 	//获取管理员总数
 	GetAdminCount()(int64,error)
+
+	//查询管理员信息
+	GetByAdminId(adminId int64)(model.Admin,bool)
+
+	//保存管理员头像
+	SaveAvatarImg(adminId int64,fileName string)bool
 }
 
 //为了方便改动数据库(mysql,oracle等)定义一个函数返回上面的接口，而接口实现在这个函数里面
@@ -50,6 +56,27 @@ func (ac *adminService)GetByAdminNameAndPassword(username,paaaword string)(model
 	var admin model.Admin
 	ac.engine.Where("admin_name = ? and pwd = ?",username,paaaword).Get(&admin)//字段不对了，卡在这里了
 	return admin,admin.AdminId != 0//是否有此对象
+}
+
+/**
+查询管理员信息
+*/
+
+func (ac *adminService)GetByAdminId(adminId int64)(model.Admin,bool)  {
+	var admin model.Admin
+	ac.engine.Id(adminId).Get(&admin)//将数据库的信息存到admin实体
+	return admin,admin.AdminId != 0
+
+}
+
+/**
+保存头像信息
+*/
+func (ac *adminService)SaveAvatarImg(adminId int64,fileName string)bool  {
+	admin := model.Admin{Avatar:fileName}
+	_,err := ac.engine.Id(adminId).Cols("avatar").Update(&admin)//把admin实体更新到数据库中的avatar列
+	return err != nil
+
 }
 
 

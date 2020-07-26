@@ -11,6 +11,8 @@ type AppConfig struct {
 	Port string`json:"port"`
 	StaticPath string`json:"static_path"`
 	Mode string`json:"mode"`
+	DataBase DataBase`json:"data_base"`
+	Redis Redis`json:"redis"`
 }
 /**
 mysql配置
@@ -21,7 +23,7 @@ type DataBase struct {
 	User string`json:"user"`
 	Pwd string`json:"pwd"`
 	Host string`json:"host"`
-	Database string`json:"database"`
+	Database string`json:"database"`//表的名称:qfcms
 }
 
 /**
@@ -32,13 +34,13 @@ type Redis struct {
 	Addr string`json:"addr"`
 	Port string`json:"port"`
 	Password string`json:"password"`
-	Prefix string `json:"prefix"`
+	Prefix string `json:"prefix"`//前缀,为了方便唯一识别本数据key.set(name vaule) -> 实际存为qfcms_name,方便区分
 }
 
 //初始化服务器配置
 func InitConfig() *AppConfig  {
 	var  config *AppConfig
-	file,err := os.Open("D:\\Code\\Go\\src\\irisDemo\\CmsProject\\utils\\config.json")
+	file,err := os.Open("D:\\Code\\Go\\src\\CmsProject\\utils\\config.json")//路径要改了，刚才没改
 	if err != nil{
 		panic(err.Error())
 	}

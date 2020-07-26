@@ -20,8 +20,15 @@ type StatisController struct {
 	Service service.StatisService
 
 	//session
-	Session *sessions.Session
+	Session *sessions.Session//临时缓存的机制
 }
+
+var (
+	ADMINMODULE = "ADMIN_"
+	USERMODULE  = "USER_"
+	ORDERMODULE = "ORDER_"
+)
+
 
 /**
  * 解析统计功能路由请求
@@ -52,14 +59,57 @@ func (sc *StatisController) GetCount() mvc.Result {
 	var result int64
 	switch model {
 	case "user":
-		iris.New().Logger().Error(date) //时间
-		result = sc.Service.GetUserDailyCount(date)
+		//加上缓存机制(session(redis))
+		//因为当日的增长可能会变,但过去七天的数据是不会改变的，所以可以使用session + redis缓存机制(适用于改变小的数据)
+		userResult := sc.Session.Get(USERMODULE + date)
+		if userResult != nil{//先查询redis缓存中的数据是否有,有则返回无则查询mysql数据库并写入redis
+			userResult = userResult.(float64)//语法:类型断言
+			return mvc.Response{
+				Object:map[string]interface{}{
+					"status":utils.RECODE_OK,
+					"count":userResult,
+				},
+			}
+		}else {
+			iris.New().Logger().Error(date) //时间
+			//将不在session(redis)中的缓存数据从mysql读出来，并写入缓存中
+			result = sc.Service.GetUserDailyCount(date)
+			//读入缓存中
+			//数据转变:
+			//raw: date:2020-04-02
+			//to:(USERMODULE)USER_2020-04-02:result(key:value)
+			sc.Session.Set(USERMODULE + date,result)
+		}
 	case "order":
-		result = sc.Service.GetOrderDailyCount(date)
+		orderStatis := sc.Session.Get(ORDERMODULE + date)
+		if orderStatis != nil{
+			orderStatis = orderStatis.(float64)
+			return mvc.Response{
+				Object:map[string]interface{}{
+					"status":utils.RECODE_OK,
+					"count":orderStatis,
+				},
+			}
+		}else {
+			result = sc.Service.GetOrderDailyCount(date)
+			sc.Session.Set(ORDERMODULE + date,result)
+		}
 	case "admin":
-		result = sc.Service.GetAdminDailyCount(date)
+		adminStatis := sc.Session.Get(ADMINMODULE + date)
+		if adminStatis != nil{
+			adminStatis = adminStatis.(float64)
+			return mvc.Response{
+				Object:map[string]interface{}{
+					"status":utils.RECODE_OK,
+					"count":adminStatis,
+				},
+			}
+		}else{
+			result = sc.Service.GetAdminDailyCount(date)
+			sc.Session.Set(ADMINMODULE + date,result)
+		}
 	}
-
+	//必须有这一步返回,假设缓存中没有会走到这一步
 	return mvc.Response{
 		Object: map[string]interface{}{
 			"status": utils.RECODE_OK,

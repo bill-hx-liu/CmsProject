@@ -1,9 +1,11 @@
 package datasource
 
 import (
+	"CmsProject/config"
 	"CmsProject/model"
 	_ "github.com/go-sql-driver/mysql" //涉及到数据库，必须这样引用且不能忘记引用
 	"github.com/go-xorm/xorm"
+	"github.com/kataras/iris"
 )
 
 //数据库引擎
@@ -11,8 +13,20 @@ import (
 实例化数据库引擎方法：mysql的数据引擎
 */
 func NewMysqlEngine() *xorm.Engine  {
-	//数据库引擎
-	engine,err := xorm.NewEngine("mysql","root:root@/qfcms?charset=utf8")	//fmt.Println(1111)
+	initConfig := config.InitConfig()
+	if initConfig == nil{
+		return nil
+	}
+	database := initConfig.DataBase
+
+	//root:root@/qfcms?charset=utf8
+	dataSourceName := database.User + ":" +database.Pwd + "@tcp(" + database.Host + ")/" + database.Database + "?charset=utf8"
+ 	//数据库引擎
+	//engine,err := xorm.NewEngine("mysql","root:root@/qfcms?charset=utf8")	//fmt.Println(1111)
+	engine,err := xorm.NewEngine(database.Drive,dataSourceName)
+
+	iris.New().Logger().Info(database)
+
 	if err != nil{
 		panic(err.Error())
 	}
