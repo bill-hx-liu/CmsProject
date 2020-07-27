@@ -3,6 +3,7 @@ package service
 import (
 	"CmsProject/model"
 	"github.com/go-xorm/xorm"
+	"github.com/kataras/iris"
 )
 
 /*
@@ -22,6 +23,9 @@ type AdminService interface {
 
 	//保存管理员头像
 	SaveAvatarImg(adminId int64,fileName string)bool
+
+	//查询管理员列表
+	GetAdminList(offset,limit int)[]*model.Admin
 }
 
 //为了方便改动数据库(mysql,oracle等)定义一个函数返回上面的接口，而接口实现在这个函数里面
@@ -77,6 +81,23 @@ func (ac *adminService)SaveAvatarImg(adminId int64,fileName string)bool  {
 	_,err := ac.engine.Id(adminId).Cols("avatar").Update(&admin)//把admin实体更新到数据库中的avatar列
 	return err != nil
 
+}
+
+/**
+获取管理员列表
+offset:管理员的偏移量
+limit:请求管理员的条数
+*/
+func (ac adminService)GetAdminList(offset,limit int)[]*model.Admin{
+	var adminList []*model.Admin
+
+	err := ac.engine.Limit(limit,offset).Find(&adminList)
+	if err != nil{
+		iris.New().Logger().Error(err.Error())
+		panic(err.Error())
+		return nil
+	}
+	return adminList
 }
 
 

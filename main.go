@@ -7,11 +7,14 @@ import (
 	"CmsProject/model"
 	"CmsProject/service"
 	"CmsProject/utils"
+	"encoding/json"
 	"github.com/kataras/iris"
 	"github.com/kataras/iris/context"
 	"github.com/kataras/iris/mvc"
 	"github.com/kataras/iris/sessions"
 	"io"
+	"io/ioutil"
+	"net/http"
 	"os"
 	"strconv"
 	"time"
@@ -243,6 +246,66 @@ func mvcHandle(app *iris.Application) {
 			"image_path":fname,
 		})
 		
+	})
+
+	////上传图片模块 待完善
+	//app.Post("/v1/addimg/{model}", func(context *context.Context) {
+	//	model := context.Params().Get("model")
+	//	iris.New().Logger().Info(model)
+	//
+	//	file,info,err := context.FormFile("file")
+	//	if err != nil{
+	//		iris.New().Logger().Info(err.Error())
+	//		context.JSON(iris.Map{
+	//			"status":utils.RECODE_FAIL,
+	//			"type":utils.RESPMSG_ERROR_PICTUREADD,
+	//			"failure":utils.Recode2Text(utils.RESPMSG_ERROR_PICTUREADD),
+	//		})
+	//		return
+	//	}
+	//	defer file.Close()
+	//	fname := info.Filename
+	//
+	//	////判断上传目录是否存在，若不存在先创建目录  待开发
+	//	//isExist,err := utils.
+	//
+	//})
+
+	//商铺模块
+	shopService := service.NewShopService(engine)
+	shop := mvc.New(app.Party("/shopping/restaurants/"))
+	shop.Register(
+		shopService,
+		sessManage.Start,)
+	shop.Handle(new(controller.ShopController))//控制器
+
+	//添加食品类别: 由于路由解析的组设置的不是很科学,所有好多不该管的也集中到这了
+	categoryService := service.NewCategoryService(engine)
+	category := mvc.New(app.Party("/shopping"))
+	category.Register(
+		categoryService,
+		)
+	category.Handle(new(controller.CategoryController))//控制器
+
+	//地址Poi检索 Poi: point of interest search:兴趣点搜索
+	app.Get("/v1/pois", func(context *context.Context) {
+		path := context.Request().URL.String()//获取path的另一种方法
+
+		rs,err := http.Get("https://elm.cangdu.org" + path)//https://elm.cangdu.org/  第三方位置服务的API,支持关键字查询
+		if err != nil{
+			context.JSON(iris.Map{
+				"status":utils.RECODE_FAIL,
+				"type":utils.RESPMSG_ERROR_SEARCHADDRESS,
+				"message":utils.Recode2Text(utils.RESPMSG_ERROR_SEARCHADDRESS),
+			})
+			return
+		}
+		//请求成功
+		body,err := ioutil.ReadAll(rs.Body)//[]byte
+		var searchList []*model.PoiSearch
+		//安马歇尔 马歇尔
+		json.Unmarshal(body,&searchList)//解析成json结构体对象
+		context.JSON(&searchList)//将切片变为json返回到前端
 	})
 }
 

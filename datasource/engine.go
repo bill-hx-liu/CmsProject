@@ -8,7 +8,7 @@ import (
 	"github.com/kataras/iris"
 )
 
-//数据库引擎
+//数据库引擎   该模块已完善无需修改
 /*
 实例化数据库引擎方法：mysql的数据引擎
 */
@@ -43,7 +43,19 @@ func NewMysqlEngine() *xorm.Engine  {
 	 * 自动警告字段的默认值，是否为空信息在模型和数据库之间不匹配的情况
 	 */
 	//Sync2是Sync的基础上优化的方法
-	err = engine.Sync2(new(model.Admin))
+	//将model中的结构体对象,数据库中无该表,则创建并更新到数据库表中
+	err = engine.Sync2(
+		new(model.Admin),
+		new(model.Permission),
+		new(model.City),
+		new(model.User),
+		new(model.UserOrder),
+		new(model.Address),
+		new(model.Shop),
+		new(model.OrderStatus),
+		new(model.FoodCategory),
+		new(model.Food),
+		)
 	if err != nil{
 		panic(err.Error())
 	}

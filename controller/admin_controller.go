@@ -10,6 +10,10 @@ import (
 	"github.com/kataras/iris/sessions"
 )
 
+/**
+/admin 路由组下的路由请求控制
+*/
+
 /*
 管理员控制器
 */
@@ -50,7 +54,7 @@ func (ac *AdminController)GetSignout() mvc.Result  {
 	}
 }
 /**
-处理获取管理员总书的路由请求
+处理获取管理员总数的路由请求
 请求类型:Get
 请求url:admin/count
 **/
@@ -113,6 +117,7 @@ func (ac *AdminController)GetInfo()mvc.Result  {
 }
 /**
  * 管理员登录功能
+*  类型：Post
  * 接口：/admin/login
  */
 func (ac *AdminController)PostLogin() mvc.Result {

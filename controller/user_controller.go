@@ -54,7 +54,7 @@ func (uc *UserController) GetCount() mvc.Result {
 }
 
 /**
- * 获取用户总数
+ * 获取用户列表
  * 请求类型：Get
  * 请求Url：/v1/users/list
  */

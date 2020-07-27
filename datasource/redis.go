@@ -7,7 +7,7 @@ import (
 )
 
 /**
-返回Redis实例
+返回Redis实例   该模块已完善无需修改
 */
 func NewRedis() *redis.Database  {
 	var database *redis.Database
